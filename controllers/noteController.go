@@ -43,3 +43,11 @@ func GetNote(w http.ResponseWriter, r *http.Request) {
 	resp["data"] = data
 	u.Respond(w, resp)
 }
+
+// GetNotes is the handler function for getting all notes from database
+func GetNotes(w http.ResponseWriter, r *http.Request) {
+	data := models.GetNotes(App.DB)
+	resp := u.Message(true, "success")
+	resp["data"] = data
+	u.Respond(w, resp)
+}
