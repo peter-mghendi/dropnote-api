@@ -41,6 +41,7 @@ func (a *App) initRoutes() {
 	a.Router = mux.NewRouter()
 	a.Router.Use(JwtAuthentication)
 	a.Router.HandleFunc(createNote, controllers.CreateNote).Methods(post)
+	a.Router.HandleFunc(getNote, controllers.GetNote).Methods(get)
 }
 
 func (a *App) initVars() {

@@ -15,11 +15,16 @@ import (
 // JwtAuthentication checks validity of the JWT
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		notAuth := []string{createNote}
+		notAuth := []string{createNote, getNote}
 		requestPath := r.URL.Path
 
 		for _, value := range notAuth {
 			if value == requestPath {
+				next.ServeHTTP(w, r)
+				return
+			}
+			prefix := strings.TrimSuffix(value, "{id}")
+			if strings.HasPrefix(requestPath, prefix) {
 				next.ServeHTTP(w, r)
 				return
 			}
