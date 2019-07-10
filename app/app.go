@@ -2,7 +2,10 @@ package app
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 
+	"dropnote-backend/controllers"
 	"dropnote-backend/models"
 
 	"github.com/gorilla/mux"
@@ -37,10 +40,11 @@ func (a *App) initDB(u URI) {
 func (a *App) initRoutes() {
 	a.Router = mux.NewRouter()
 	a.Router.Use(JwtAuthentication)
+	a.Router.HandleFunc(createNote, controllers.CreateNote).Methods(post)
 }
 
 func (a *App) initVars() {
-	fmt.Println("Exporting variables")
+	controllers.App.Router, controllers.App.DB = a.Router, a.DB
 }
 
 // Init sets up database and routes
@@ -52,5 +56,6 @@ func (a *App) Init(u URI) {
 
 // Run serves the API on a specified port
 func (a *App) Run() {
-	fmt.Printf("Running on port %s", a.Port)
+	fmt.Printf("Serving on localhost:%v\n", a.Port)
+	log.Fatal(http.ListenAndServe(":"+a.Port, a.Router))
 }

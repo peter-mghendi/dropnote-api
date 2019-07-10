@@ -15,7 +15,7 @@ import (
 // JwtAuthentication checks validity of the JWT
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		notAuth := []string{}
+		notAuth := []string{createNote}
 		requestPath := r.URL.Path
 
 		for _, value := range notAuth {
