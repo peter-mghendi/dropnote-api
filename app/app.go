@@ -19,7 +19,7 @@ type URI struct {
 
 func (a *App) initDB(u URI) {
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", u.Host, u.User, u.Name, u.Pass)
-	fmt.Printf("Initializing database with URI:\n%s\n", dbURI)
+	fmt.Sprintf(dbURI)
 }
 
 func (a *App) initRoutes() {
