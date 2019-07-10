@@ -12,10 +12,8 @@ import (
 )
 
 var app a.App
-var uri a.URI
-
 var err error
-var port string
+var uri a.URI
 
 func init() {
 	e := godotenv.Load()
