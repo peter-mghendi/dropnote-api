@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	u "rest-secure/utils"
+	u "dropnote-backend/utils"
 
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"

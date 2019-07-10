@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"rest-secure/models"
-	u "rest-secure/utils"
+	"dropnote-backend/models"
+	u "dropnote-backend/utils"
 	"strings"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -15,7 +15,7 @@ import (
 // JwtAuthentication checks validity of the JWT
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		notAuth := []string{createNote, getNote, getNotes}
+		notAuth := []string{createUser, createNote, getNote, getNotes}
 		requestPath := r.URL.Path
 
 		for _, value := range notAuth {
