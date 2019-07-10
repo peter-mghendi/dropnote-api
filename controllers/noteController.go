@@ -13,10 +13,10 @@ import (
 // CreateNote is the handler function for adding a note to the database
 func CreateNote(w http.ResponseWriter, r *http.Request) {
 	var id string
-	if r.Context().Value("user") == nil {
+	if r.Context().Value(UserKey) == nil {
 		id = ""
 	} else {
-		id = (r.Context().Value("user").(uuid.UUID)).String()
+		id = (r.Context().Value(UserKey).(uuid.UUID)).String()
 	}
 	user := uuid.FromStringOrNil(id)
 	note := &models.Note{}

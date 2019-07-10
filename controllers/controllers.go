@@ -11,6 +11,10 @@ type Application struct {
 	DB     *gorm.DB
 }
 
+type key string
+
+const UserKey key = "user"
+
 // App is an instance of Application
 var App *Application
 
