@@ -74,7 +74,7 @@ func (user *User) Create(db *gorm.DB) map[string]interface{} {
 }
 
 // Login authorizes a user and assigns JWT token
-func Login(mail, pass string, db *gorm.DB) map[string]interface{} {
+func Login(db *gorm.DB, mail, pass string) map[string]interface{} {
 	user := &User{}
 	err := db.Where(User{Mail: mail}).First(user).Error
 	if err != nil {
@@ -101,7 +101,7 @@ func Login(mail, pass string, db *gorm.DB) map[string]interface{} {
 }
 
 // GetUser fetches the user from db
-func GetUser(u uuid.UUID, db *gorm.DB) (user *User) {
+func GetUser(db *gorm.DB, u uuid.UUID) (user *User) {
 	user = &User{}
 	db.Where(User{Base: Base{ID: u}}).First(user)
 	if user.Mail == "" {

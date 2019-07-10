@@ -15,7 +15,7 @@ import (
 // JwtAuthentication checks validity of the JWT
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		notAuth := []string{createUser, createNote, getNote, getNotes}
+		notAuth := []string{createUser, authUser, createNote, getNote, getNotes}
 		requestPath := r.URL.Path
 
 		for _, value := range notAuth {
@@ -23,8 +23,7 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 				next.ServeHTTP(w, r)
 				return
 			}
-			prefix := strings.TrimSuffix(value, "{id}")
-			if strings.HasPrefix(requestPath, prefix) {
+			if prefix := strings.TrimSuffix(value, "{id}"); strings.HasPrefix(requestPath, prefix) {
 				next.ServeHTTP(w, r)
 				return
 			}
