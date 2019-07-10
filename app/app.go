@@ -9,12 +9,14 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// App holds details about router, database and port
 type App struct {
 	Router *mux.Router
 	DB     *gorm.DB
 	Port   string
 }
 
+// URI holds database connection credentials
 type URI struct {
 	Host, User, Name, Pass, Type string
 }
@@ -23,7 +25,7 @@ var err error
 
 func (a *App) initDB(u URI) {
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", u.Host, u.User, u.Name, u.Pass)
-	fmt.Sprintf(dbURI)
+	_ = fmt.Sprintf(dbURI)
 	a.DB, err = gorm.Open(u.Type, dbURI)
 	if err != nil {
 		fmt.Print(err)
@@ -34,7 +36,7 @@ func (a *App) initDB(u URI) {
 
 func (a *App) initRoutes() {
 	a.Router = mux.NewRouter()
-	fmt.Println("Initializing routes")
+	a.Router.Use(JwtAuthentication)
 }
 
 func (a *App) initVars() {
