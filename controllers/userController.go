@@ -10,12 +10,17 @@ import (
 
 // GetUser is the handler funcion for getting a user fom the database.
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	if r.Context().Value(UserKey) == nil {
-		u.Respond(w, u.Message(false, "Please log in"))
-		return
-	}
 	id := r.Context().Value(UserKey).(uuid.UUID)
 	user := models.GetUser(App.DB, id)
+	resp := u.Message(true, "success")
+	resp["data"] = user
+	u.Respond(w, resp)
+}
+
+// GetUserNotes is the handler funcion for getting a user fom the database.
+func GetUserNotes(w http.ResponseWriter, r *http.Request) {
+	id := r.Context().Value(UserKey).(uuid.UUID)
+	user := models.GetNotesFor(App.DB, id)
 	resp := u.Message(true, "success")
 	resp["data"] = user
 	u.Respond(w, resp)

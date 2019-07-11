@@ -1,8 +1,8 @@
 package models
 
 import (
-	"fmt"
 	u "dropnote-backend/utils"
+	"fmt"
 
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
@@ -54,6 +54,17 @@ func GetNote(db *gorm.DB, id uuid.UUID) (note *Note) {
 func GetNotes(db *gorm.DB) (notes []*Note) {
 	notes = make([]*Note, 0)
 	err := db.Find(&notes).Error
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return
+}
+
+// GetPersonsFor returns an array of notes created by a specific user
+func GetNotesFor(db *gorm.DB, user uuid.UUID) (notes []*Note) {
+	notes = make([]*Note, 0)
+	err := db.Where(&Note{Creator: user}).Find(&notes).Error
 	if err != nil {
 		fmt.Println(err)
 		return nil
