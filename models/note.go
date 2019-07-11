@@ -2,6 +2,7 @@ package models
 
 import (
 	u "dropnote-backend/utils"
+	"errors"
 	"fmt"
 
 	"github.com/jinzhu/gorm"
@@ -61,7 +62,7 @@ func GetNotes(db *gorm.DB) (notes []*Note) {
 	return
 }
 
-// GetPersonsFor returns an array of notes created by a specific user
+// GetNotesFor returns an array of notes created by a specific user
 func GetNotesFor(db *gorm.DB, user uuid.UUID) (notes []*Note) {
 	notes = make([]*Note, 0)
 	err := db.Where(&Note{Creator: user}).Find(&notes).Error
@@ -70,4 +71,13 @@ func GetNotesFor(db *gorm.DB, user uuid.UUID) (notes []*Note) {
 		return nil
 	}
 	return
+}
+
+// DeleteNoteFor deletes a note created by a specific user
+func DeleteNoteFor(db *gorm.DB, user, note uuid.UUID) error {
+	count := db.Where(&Note{Base: Base{ID: note}, Creator: user}).Delete(&Note{}).RowsAffected
+	if count == 0 {
+		return errors.New("No rows matching criteria")
+	}
+	return nil
 }

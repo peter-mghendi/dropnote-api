@@ -10,4 +10,5 @@ const (
 	getUser                = "/api/me"
 	deleteUser             = "/api/me/delete"
 	getUserNotes           = "/api/me/notes"
+	deleteUserNote         = "/api/me/notes/delete/{id}"
 )
