@@ -7,4 +7,5 @@ const (
 	createNote             = "/api/note/new"
 	getNote                = "/api/note/{id}"
 	getNotes               = "/api/notes"
+	getUser                = "/api/me"
 )

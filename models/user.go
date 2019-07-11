@@ -107,6 +107,6 @@ func GetUser(db *gorm.DB, u uuid.UUID) (user *User) {
 	if user.Mail == "" {
 		return nil
 	}
-	user.Mail = ""
+	user.Pass = ""
 	return
 }

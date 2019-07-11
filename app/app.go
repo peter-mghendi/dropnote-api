@@ -45,6 +45,7 @@ func (a *App) initRoutes() {
 	a.Router.HandleFunc(createNote, controllers.CreateNote).Methods(post)
 	a.Router.HandleFunc(getNote, controllers.GetNote).Methods(get)
 	a.Router.HandleFunc(getNotes, controllers.GetNotes).Methods(get)
+	a.Router.HandleFunc(getUser, controllers.GetUser).Methods(get)
 }
 
 func (a *App) initVars() {
