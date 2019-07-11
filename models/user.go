@@ -110,3 +110,9 @@ func GetUser(db *gorm.DB, u uuid.UUID) (user *User) {
 	user.Pass = ""
 	return
 }
+
+// DeleteUser removes a user from the database
+func DeleteUser(db *gorm.DB, user *User) (err error) {
+	err = db.Delete(user).Error
+	return
+}

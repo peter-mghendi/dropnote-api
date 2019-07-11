@@ -8,5 +8,6 @@ const (
 	getNote                = "/api/note/{id}"
 	getNotes               = "/api/notes"
 	getUser                = "/api/me"
+	deleteUser             = "/api/me/delete"
 	getUserNotes           = "/api/me/notes"
 )
