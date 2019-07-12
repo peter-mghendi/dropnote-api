@@ -73,8 +73,17 @@ func GetNotesFor(db *gorm.DB, user uuid.UUID) (notes []*Note) {
 	return
 }
 
+// UpdateNoteFor updates a note created by a specific user
+func UpdateNoteFor(db *gorm.DB, note *Note) error {
+	if err := db.Save(note).Error; err != nil {
+		return errors.New(err.Error())
+	}
+	return nil
+}
+
 // DeleteNoteFor deletes a note created by a specific user
-func DeleteNoteFor(db *gorm.DB, user, note uuid.UUID) error {
+// TODO move user auth to handler
+func DeleteNoteFor(db *gorm.DB, note, user uuid.UUID) error {
 	count := db.Where(&Note{Base: Base{ID: note}, Creator: user}).Delete(&Note{}).RowsAffected
 	if count == 0 {
 		return errors.New("No rows matching criteria")
