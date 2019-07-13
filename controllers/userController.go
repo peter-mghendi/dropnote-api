@@ -93,8 +93,8 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	err := models.DeleteUser(App.DB, user)
 	resp := u.Message(true, "success")
 	if err != nil {
-		// TODO Better error handling
 		resp = u.Message(false, "failed")
+		resp["error"] = err
 	}
 	u.Respond(w, resp)
 }
@@ -137,28 +137,38 @@ func UpdateUserNote(w http.ResponseWriter, r *http.Request) {
 	err = models.UpdateNote(App.DB, note)
 	resp := u.Message(true, "success")
 	if err != nil {
-		// TODO Better error handling
 		resp = u.Message(false, "failed")
+		resp["error"] = err
 	}
 	u.Respond(w, resp)
 }
 
 // DeleteUserNote is the handler function for removing a note created by current user from the database
-// TODO Auth
 func DeleteUserNote(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	note, err := uuid.FromString(params["id"])
+	user := r.Context().Value(UserKey).(uuid.UUID)
+	id, err := uuid.FromString(params["id"])
 	if err != nil {
 		u.Respond(w, u.Message(false, "There was an error in your request"))
 		return
 	}
 
-	user := r.Context().Value(UserKey).(uuid.UUID)
-	err = models.DeleteNoteFor(App.DB, note, user)
+	note := models.GetNote(App.DB, id)
+	if note == nil {
+		u.Respond(w, u.Message(false, "That note does not exist"))
+		return
+	}
+
+	if !uuid.Equal(note.Creator, user) {
+		u.Respond(w, u.Message(false, "You are not authorized to delete that record"))
+		return
+	}
+
+	err = models.DeleteNote(App.DB, note)
 	resp := u.Message(true, "success")
 	if err != nil {
-		// TODO Better error handling
 		resp = u.Message(false, "failed")
+		resp["error"] = err
 	}
 	u.Respond(w, resp)
 }

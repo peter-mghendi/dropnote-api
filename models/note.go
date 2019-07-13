@@ -81,10 +81,10 @@ func UpdateNote(db *gorm.DB, note *Note) error {
 	return nil
 }
 
-// DeleteNoteFor deletes a note created by a specific user
-// TODO move user auth to handler
-func DeleteNoteFor(db *gorm.DB, note, user uuid.UUID) error {
-	count := db.Where(&Note{Base: Base{ID: note}, Creator: user}).Delete(&Note{}).RowsAffected
+// DeleteNote deletes a note created by a specific user
+func DeleteNote(db *gorm.DB, note *Note) error {
+	// count := db.Where(&Note{Base: Base{ID: note}, Creator: user}).Delete(&Note{}).RowsAffected
+	count := db.Delete(note).RowsAffected
 	if count == 0 {
 		return errors.New("No rows matching criteria")
 	}

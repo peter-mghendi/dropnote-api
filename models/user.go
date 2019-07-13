@@ -19,10 +19,9 @@ type Token struct {
 }
 
 // User is a struct to rep user
-// TODO
 type User struct {
 	Base
-	Name string `json:"user"`
+	Name string `json:"name"`
 	Mail string `json:"mail"`
 	Pass string `json:"pass"`
 	Auth string `sql:"-" json:"auth"`
@@ -69,10 +68,9 @@ func (user *User) Create(db *gorm.DB) map[string]interface{} {
 	user.Auth = authString
 	user.Pass = ""
 
-	// TODO
-	response := u.Message(true, "User has been created")
-	response["user"] = user
-	return response
+	resp := u.Message(true, "User has been created")
+	resp["user"] = user
+	return resp
 }
 
 // Login authorizes a user and assigns JWT token
