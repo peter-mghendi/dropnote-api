@@ -19,6 +19,7 @@ type Token struct {
 }
 
 // User is a struct to rep user
+// TODO
 type User struct {
 	Base
 	Name string `json:"user"`
@@ -68,6 +69,7 @@ func (user *User) Create(db *gorm.DB) map[string]interface{} {
 	user.Auth = authString
 	user.Pass = ""
 
+	// TODO
 	response := u.Message(true, "User has been created")
 	response["user"] = user
 	return response
@@ -108,6 +110,37 @@ func GetUser(db *gorm.DB, u uuid.UUID) (user *User) {
 		return nil
 	}
 	user.Pass = ""
+	return
+}
+
+// GetUserByMail fetches the user from db
+func GetUserByMail(db *gorm.DB, mail string) (user *User) {
+	user = &User{}
+	db.Where(User{Mail: mail}).First(user)
+	if user.Mail == "" {
+		return nil
+	}
+	user.Pass = ""
+	return
+}
+
+// UpdateUser updates a user in the db
+func UpdateUser(db *gorm.DB, user *User) (err error) {
+	err = db.Model(&user).Updates(User{Name: user.Name, Mail: user.Mail}).Error
+	return
+}
+
+// UpdatePassword hashes and updates provided password
+func UpdatePassword(db *gorm.DB, user *User) (err error) {
+	// TODO Move hashing to hook
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Pass), 10)
+	if err != nil {
+		return
+	}
+	user.Pass = string(hash)
+	if err = db.Model(&user).Updates(User{Pass: user.Pass}).Error; err != nil {
+		return
+	}
 	return
 }
 

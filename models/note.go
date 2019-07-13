@@ -73,8 +73,8 @@ func GetNotesFor(db *gorm.DB, user uuid.UUID) (notes []*Note) {
 	return
 }
 
-// UpdateNoteFor updates a note created by a specific user
-func UpdateNoteFor(db *gorm.DB, note *Note) error {
+// UpdateNote updates a note created by a specific user
+func UpdateNote(db *gorm.DB, note *Note) error {
 	if err := db.Save(note).Error; err != nil {
 		return errors.New(err.Error())
 	}
