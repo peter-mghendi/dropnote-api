@@ -45,6 +45,13 @@ func (a *App) initRoutes() {
 	a.Router.HandleFunc(createNote, controllers.CreateNote).Methods(post)
 	a.Router.HandleFunc(getNote, controllers.GetNote).Methods(get)
 	a.Router.HandleFunc(getNotes, controllers.GetNotes).Methods(get)
+	a.Router.HandleFunc(getUser, controllers.GetUser).Methods(get)
+	a.Router.HandleFunc(updateUser, controllers.UpdateUser).Methods(put)
+	a.Router.HandleFunc(updatePassword, controllers.UpdatePassword).Methods(put)
+	a.Router.HandleFunc(deleteUser, controllers.DeleteUser).Methods(delete)
+	a.Router.HandleFunc(getUserNotes, controllers.GetUserNotes).Methods(get)
+	a.Router.HandleFunc(updateUserNote, controllers.UpdateUserNote).Methods(put)
+	a.Router.HandleFunc(deleteUserNote, controllers.DeleteUserNote).Methods(delete)
 }
 
 func (a *App) initVars() {

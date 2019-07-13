@@ -7,4 +7,11 @@ const (
 	createNote             = "/api/note/new"
 	getNote                = "/api/note/{id}"
 	getNotes               = "/api/notes"
+	getUser                = "/api/me"
+	updateUser             = "/api/me/update"
+	updatePassword         = "/api/me/change"
+	deleteUser             = "/api/me/delete"
+	getUserNotes           = "/api/me/notes"
+	updateUserNote         = "/api/me/notes/update/{id}"
+	deleteUserNote         = "/api/me/notes/delete/{id}"
 )

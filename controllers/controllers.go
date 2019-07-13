@@ -13,6 +13,7 @@ type Application struct {
 
 type key string
 
+// UserKey is a constant context key
 const UserKey key = "user"
 
 // App is an instance of Application

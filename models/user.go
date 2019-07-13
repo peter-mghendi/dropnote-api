@@ -21,7 +21,7 @@ type Token struct {
 // User is a struct to rep user
 type User struct {
 	Base
-	Name string `json:"user"`
+	Name string `json:"name"`
 	Mail string `json:"mail"`
 	Pass string `json:"pass"`
 	Auth string `sql:"-" json:"auth"`
@@ -68,9 +68,9 @@ func (user *User) Create(db *gorm.DB) map[string]interface{} {
 	user.Auth = authString
 	user.Pass = ""
 
-	response := u.Message(true, "User has been created")
-	response["user"] = user
-	return response
+	resp := u.Message(true, "User has been created")
+	resp["user"] = user
+	return resp
 }
 
 // Login authorizes a user and assigns JWT token
@@ -107,6 +107,43 @@ func GetUser(db *gorm.DB, u uuid.UUID) (user *User) {
 	if user.Mail == "" {
 		return nil
 	}
-	user.Mail = ""
+	user.Pass = ""
+	return
+}
+
+// GetUserByMail fetches the user from db
+func GetUserByMail(db *gorm.DB, mail string) (user *User) {
+	user = &User{}
+	db.Where(User{Mail: mail}).First(user)
+	if user.Mail == "" {
+		return nil
+	}
+	user.Pass = ""
+	return
+}
+
+// UpdateUser updates a user in the db
+func UpdateUser(db *gorm.DB, user *User) (err error) {
+	err = db.Model(&user).Updates(User{Name: user.Name, Mail: user.Mail}).Error
+	return
+}
+
+// UpdatePassword hashes and updates provided password
+func UpdatePassword(db *gorm.DB, user *User) (err error) {
+	// TODO Move hashing to hook
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Pass), 10)
+	if err != nil {
+		return
+	}
+	user.Pass = string(hash)
+	if err = db.Model(&user).Updates(User{Pass: user.Pass}).Error; err != nil {
+		return
+	}
+	return
+}
+
+// DeleteUser removes a user from the database
+func DeleteUser(db *gorm.DB, user *User) (err error) {
+	err = db.Delete(user).Error
 	return
 }
