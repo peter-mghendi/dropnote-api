@@ -5,7 +5,6 @@ import (
 	"dropnote-backend/controllers"
 	"dropnote-backend/models"
 	u "dropnote-backend/utils"
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -48,30 +47,29 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 			}
 		}
 
-		response := make(map[string]interface{})
 		tokenHeader := r.Header.Get("Authorization")
 
-		for _, value := range mayAuth {
-			if tokenHeader == "" && value == requestPath {
-				next.ServeHTTP(w, r)
-				return
-			}
-		}
-
 		if tokenHeader == "" {
-			response = u.Message(false, "Missing auth token")
+			for _, value := range mayAuth {
+				if value == requestPath {
+					next.ServeHTTP(w, r)
+					return
+				}
+			}
+
+			resp := u.Message(false, "Missing auth token")
 			w.WriteHeader(http.StatusForbidden)
 			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+			u.Respond(w, resp)
 			return
 		}
 
 		splitted := strings.Split(tokenHeader, " ")
 		if len(splitted) != 2 {
-			response = u.Message(false, "Invalid/Malformed auth token")
+			resp := u.Message(false, "Invalid/Malformed auth token")
 			w.WriteHeader(http.StatusForbidden)
 			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+			u.Respond(w, resp)
 			return
 		}
 
@@ -83,18 +81,18 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 		})
 
 		if err != nil {
-			response = u.Message(false, "Malformed authentication token")
+			resp := u.Message(false, "Malformed authentication token")
 			w.WriteHeader(http.StatusForbidden)
 			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+			u.Respond(w, resp)
 			return
 		}
 
 		if !token.Valid {
-			response = u.Message(false, "Token is not valid.")
+			resp := u.Message(false, "Token is not valid.")
 			w.WriteHeader(http.StatusForbidden)
 			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+			u.Respond(w, resp)
 			return
 		}
 
