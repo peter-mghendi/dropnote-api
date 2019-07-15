@@ -21,7 +21,7 @@ type Token struct {
 // User is a struct to rep user
 type User struct {
 	Base
-	Name string `json:"user"`
+	Name string `json:"name"`
 	Mail string `json:"mail"`
 	Pass string `json:"pass"`
 	Auth string `sql:"-" json:"auth"`
@@ -68,13 +68,13 @@ func (user *User) Create(db *gorm.DB) map[string]interface{} {
 	user.Auth = authString
 	user.Pass = ""
 
-	response := u.Message(true, "User has been created")
-	response["user"] = user
-	return response
+	resp := u.Message(true, "User has been created")
+	resp["user"] = user
+	return resp
 }
 
 // Login authorizes a user and assigns JWT token
-func Login(mail, pass string, db *gorm.DB) map[string]interface{} {
+func Login(db *gorm.DB, mail, pass string) map[string]interface{} {
 	user := &User{}
 	err := db.Where(User{Mail: mail}).First(user).Error
 	if err != nil {
@@ -101,12 +101,48 @@ func Login(mail, pass string, db *gorm.DB) map[string]interface{} {
 }
 
 // GetUser fetches the user from db
-func GetUser(u uuid.UUID, db *gorm.DB) (user *User) {
+func GetUser(db *gorm.DB, u uuid.UUID) (user *User) {
 	user = &User{}
 	db.Where(User{Base: Base{ID: u}}).First(user)
 	if user.Mail == "" {
 		return nil
 	}
-	user.Mail = ""
+	user.Pass = ""
+	return
+}
+
+// GetUserByMail fetches the user from db
+func GetUserByMail(db *gorm.DB, mail string) (user *User) {
+	user = &User{}
+	db.Where(User{Mail: mail}).First(user)
+	if user.Mail == "" {
+		return nil
+	}
+	user.Pass = ""
+	return
+}
+
+// UpdateUser updates a user in the db
+func UpdateUser(db *gorm.DB, user *User) (err error) {
+	err = db.Model(&user).Updates(User{Name: user.Name, Mail: user.Mail}).Error
+	return
+}
+
+// UpdatePassword hashes and updates provided password
+func UpdatePassword(db *gorm.DB, user *User) (err error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Pass), 10)
+	if err != nil {
+		return
+	}
+	user.Pass = string(hash)
+	if err = db.Model(&user).Updates(User{Pass: user.Pass}).Error; err != nil {
+		return
+	}
+	return
+}
+
+// DeleteUser removes a user from the database
+func DeleteUser(db *gorm.DB, user *User) (err error) {
+	err = db.Delete(user).Error
 	return
 }

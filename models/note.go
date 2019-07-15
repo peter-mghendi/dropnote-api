@@ -1,8 +1,9 @@
 package models
 
 import (
+	u "dropnote-backend/utils"
+	"errors"
 	"fmt"
-	u "rest-secure/utils"
 
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
@@ -59,4 +60,33 @@ func GetNotes(db *gorm.DB) (notes []*Note) {
 		return nil
 	}
 	return
+}
+
+// GetNotesFor returns an array of notes created by a specific user
+func GetNotesFor(db *gorm.DB, user uuid.UUID) (notes []*Note) {
+	notes = make([]*Note, 0)
+	err := db.Where(&Note{Creator: user}).Find(&notes).Error
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	return
+}
+
+// UpdateNote updates a note created by a specific user
+func UpdateNote(db *gorm.DB, note *Note) error {
+	if err := db.Save(note).Error; err != nil {
+		return errors.New(err.Error())
+	}
+	return nil
+}
+
+// DeleteNote deletes a note created by a specific user
+func DeleteNote(db *gorm.DB, note *Note) error {
+	// count := db.Where(&Note{Base: Base{ID: note}, Creator: user}).Delete(&Note{}).RowsAffected
+	count := db.Delete(note).RowsAffected
+	if count == 0 {
+		return errors.New("No rows matching criteria")
+	}
+	return nil
 }
