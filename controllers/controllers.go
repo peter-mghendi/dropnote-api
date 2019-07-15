@@ -28,6 +28,6 @@ func init() {
 
 func emailTokenToUser(user, code uuid.UUID) bool {
 	// TODO
-	fmt.Printf("http://localhost:8000/user/%s/action/%s\n", user.String(), code.String())
+	fmt.Printf("http://localhost:8000/api/user/%s/action/%s\n", user.String(), code.String())
 	return true
 }

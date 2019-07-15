@@ -23,11 +23,13 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 
 		for _, value := range notAuth {
 			// TODO
+			// notAuth
 			if value == requestPath {
 				next.ServeHTTP(w, r)
 				return
 			}
 
+			// getNote
 			prefix := strings.TrimSuffix(value, "{id}")
 			suffix := strings.TrimPrefix(requestPath, prefix)
 			isUUID := false
@@ -38,7 +40,15 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 				next.ServeHTTP(w, r)
 				return
 			}
+
+			// generateCode
 			if strings.HasSuffix(requestPath, "/reset") {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			// executeCode
+			if strings.Contains(requestPath, "/action/") {
 				next.ServeHTTP(w, r)
 				return
 			}

@@ -29,3 +29,26 @@ func GenerateCode(w http.ResponseWriter, r *http.Request) {
 	resp := u.Message(true, "success")
 	u.Respond(w, resp)
 }
+
+// ExecuteCode is the handler function for carrying out a token action
+func ExecuteCode(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	user, err := uuid.FromString(params["user"])
+	if err != nil {
+		u.Respond(w, u.Message(false, "There was an error in your request"))
+		return
+	}
+	code, err := uuid.FromString(params["code"])
+	if err != nil {
+		u.Respond(w, u.Message(false, "There was an error in your request"))
+		return
+	}
+
+	if err = models.Execute(App.DB, code, user); err != nil {
+		u.Respond(w, u.Message(false, err.Error()))
+		return
+	}
+
+	resp := u.Message(true, "success")
+	u.Respond(w, resp)
+}

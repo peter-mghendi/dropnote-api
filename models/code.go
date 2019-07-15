@@ -29,6 +29,12 @@ func (c *Code) exists(db *gorm.DB) bool {
 	return count != 0
 }
 
+func getCode(db *gorm.DB, ticket uuid.UUID) *Code {
+	code := Code{}
+	db.Where(&Code{Ticket: ticket}).First(&code)
+	return &code
+}
+
 // isValid checks the validity of a Code
 func (c *Code) isValid(db *gorm.DB, user uuid.UUID) bool {
 	if !c.exists(db) {
@@ -56,7 +62,8 @@ func New(db *gorm.DB, action int, userID uuid.UUID) (uuid.UUID, error) {
 }
 
 // Execute runs c.Action against user
-func (c *Code) Execute(db *gorm.DB, user uuid.UUID) error {
+func Execute(db *gorm.DB, code, user uuid.UUID) error {
+	c := getCode(db, code)
 	if !c.isValid(db, user) {
 		return errors.New("Code is invalid")
 	}

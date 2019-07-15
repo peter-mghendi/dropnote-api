@@ -53,6 +53,7 @@ func (a *App) initRoutes() {
 	a.Router.HandleFunc(updateUserNote, controllers.UpdateUserNote).Methods(put)
 	a.Router.HandleFunc(deleteUserNote, controllers.DeleteUserNote).Methods(delete)
 	a.Router.HandleFunc(generateCode, controllers.GenerateCode).Methods(post)
+	a.Router.HandleFunc(executeCode, controllers.ExecuteCode).Methods(post)
 }
 
 func (a *App) initVars() {
