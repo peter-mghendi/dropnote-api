@@ -22,6 +22,7 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 		requestPath := r.URL.Path
 
 		for _, value := range notAuth {
+			// TODO
 			if value == requestPath {
 				next.ServeHTTP(w, r)
 				return
@@ -34,6 +35,10 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 				isUUID = true
 			}
 			if strings.HasPrefix(requestPath, prefix) && isUUID {
+				next.ServeHTTP(w, r)
+				return
+			}
+			if strings.HasSuffix(requestPath, "/reset") {
 				next.ServeHTTP(w, r)
 				return
 			}
