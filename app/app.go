@@ -34,7 +34,7 @@ func (a *App) initDB(u URI) {
 		fmt.Print(err)
 	}
 
-	a.DB.Debug().AutoMigrate(&models.User{}, &models.Note{})
+	a.DB.Debug().AutoMigrate(&models.User{}, &models.Note{}, &models.Code{})
 }
 
 func (a *App) initRoutes() {
