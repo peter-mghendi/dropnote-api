@@ -14,4 +14,6 @@ const (
 	getUserNotes           = "/api/me/notes"
 	updateUserNote         = "/api/me/notes/update/{id}"
 	deleteUserNote         = "/api/me/notes/delete/{id}"
+	generateCode           = "/api/user/{user}/action/reset"
+	executeCode            = "/api/user/{user}/action/{code}"
 )
