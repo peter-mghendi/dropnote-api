@@ -44,7 +44,7 @@ func ExecuteCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = models.Execute(App.DB, code, user); err != nil {
+	if err = models.Execute(App.DB, r.Body, code, user); err != nil {
 		u.Respond(w, u.Message(false, err.Error()))
 		return
 	}

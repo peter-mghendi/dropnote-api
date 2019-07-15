@@ -1,8 +1,9 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
-	"fmt"
+	"io"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -49,6 +50,29 @@ func (c *Code) isValid(db *gorm.DB, user uuid.UUID) bool {
 	return true
 }
 
+func (c *Code) perform(db *gorm.DB, body io.ReadCloser) error {
+	switch c.Action {
+	case Actions["reset"]:
+		password := struct {
+			Password string `json:"password"`
+		}{}
+		if err := json.NewDecoder(body).Decode(&password); err != nil {
+			return errors.New("Error while decoding request body")
+		}
+		if password.Password == "" {
+			return errors.New("Empty password string")
+		}
+		user := GetUser(db, c.UserID)
+		user.Pass = password.Password
+		if err := UpdatePassword(db, user); err != nil {
+			return err
+		}
+	default:
+		return errors.New("Invalid action")
+	}
+	return nil
+}
+
 // New returns a pointer to a new Code variable
 func New(db *gorm.DB, action int, userID uuid.UUID) (uuid.UUID, error) {
 	ticket, err := uuid.NewV4()
@@ -62,12 +86,14 @@ func New(db *gorm.DB, action int, userID uuid.UUID) (uuid.UUID, error) {
 }
 
 // Execute runs c.Action against user
-func Execute(db *gorm.DB, code, user uuid.UUID) error {
+func Execute(db *gorm.DB, body io.ReadCloser, code, user uuid.UUID) error {
 	c := getCode(db, code)
 	if !c.isValid(db, user) {
 		return errors.New("Code is invalid")
 	}
-	fmt.Printf("Action %v performed on user %v\n", c.Action, user)
+	if err := c.perform(db, body); err != nil {
+		return err
+	}
 	db.Unscoped().Delete(c)
 	return nil
 }

@@ -130,7 +130,6 @@ func UpdateUser(db *gorm.DB, user *User) (err error) {
 
 // UpdatePassword hashes and updates provided password
 func UpdatePassword(db *gorm.DB, user *User) (err error) {
-	// TODO Move hashing to hook
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Pass), 10)
 	if err != nil {
 		return

@@ -41,13 +41,7 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 				return
 			}
 
-			// generateCode
-			if strings.HasSuffix(requestPath, "/reset") {
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			// executeCode
+			// codeController
 			if strings.Contains(requestPath, "/action/") {
 				next.ServeHTTP(w, r)
 				return
