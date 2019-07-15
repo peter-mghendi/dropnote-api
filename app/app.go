@@ -28,7 +28,6 @@ var err error
 
 func (a *App) initDB(u URI) {
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", u.Host, u.User, u.Name, u.Pass)
-	_ = fmt.Sprintf(dbURI)
 	a.DB, err = gorm.Open(u.Type, dbURI)
 	if err != nil {
 		fmt.Print(err)
