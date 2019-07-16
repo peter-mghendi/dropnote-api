@@ -2,9 +2,9 @@ package app
 
 import (
 	"context"
-	"dropnote-backend/controllers"
-	"dropnote-backend/models"
-	u "dropnote-backend/utils"
+	"github.com/l3njo/dropnote-backend/controllers"
+	"github.com/l3njo/dropnote-backend/models"
+	u "github.com/l3njo/dropnote-backend/utils"
 	"net/http"
 	"os"
 	"strings"

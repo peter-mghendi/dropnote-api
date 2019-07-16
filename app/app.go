@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"dropnote-backend/controllers"
-	"dropnote-backend/models"
+	"github.com/l3njo/dropnote-backend/controllers"
+	"github.com/l3njo/dropnote-backend/models"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"

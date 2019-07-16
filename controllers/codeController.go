@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"dropnote-backend/models"
-	u "dropnote-backend/utils"
+	"github.com/l3njo/dropnote-backend/models"
+	u "github.com/l3njo/dropnote-backend/utils"
 	"net/http"
 
 	"github.com/gorilla/mux"

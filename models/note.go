@@ -1,7 +1,7 @@
 package models
 
 import (
-	u "dropnote-backend/utils"
+	u "github.com/l3njo/dropnote-backend/utils"
 	"errors"
 	"fmt"
 

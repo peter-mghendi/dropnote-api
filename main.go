@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	a "dropnote-backend/app"
+	a "github.com/l3njo/dropnote-backend/app"
 
 	"github.com/joho/godotenv"
 
