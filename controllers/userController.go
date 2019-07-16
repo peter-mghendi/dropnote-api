@@ -38,11 +38,11 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	user.Name = temp.Name
 	user.Mail = temp.Mail
 
-	err = models.UpdateUser(App.DB, user)
-	resp := u.Message(true, "success")
-	if err != nil {
-		resp = u.Message(false, "failed")
-		resp["error"] = err
+	resp := make(map[string]interface{})
+	if data, err := models.UpdateUser(App.DB, user); err != nil {
+		resp = u.Message(false, err.Error())
+	} else {
+		resp = data
 	}
 	u.Respond(w, resp)
 }
@@ -66,22 +66,16 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mail, pass := user.Mail, payload.Current
-
-	result := models.Login(App.DB, mail, pass)
-	ok := result["status"].(bool)
-	if !ok {
-		message := result["message"].(string)
-		u.Respond(w, u.Message(false, message))
+	if _, err := models.Login(App.DB, user.Mail, payload.Current); err != nil {
+		u.Respond(w, u.Message(false, err.Error()))
 		return
 	}
 
 	user.Pass = payload.Updated
-	err = models.UpdatePassword(App.DB, user)
+
 	resp := u.Message(true, "success")
-	if err != nil {
-		resp = u.Message(false, "failed")
-		resp["error"] = err
+	if err = models.UpdatePassword(App.DB, user); err != nil {
+		resp = u.Message(false, err.Error())
 	}
 	u.Respond(w, resp)
 }
@@ -134,11 +128,12 @@ func UpdateUserNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = models.UpdateNote(App.DB, note)
-	resp := u.Message(true, "success")
-	if err != nil {
+	resp := make(map[string]interface{})
+	if data, err := models.UpdateNote(App.DB, note); err != nil {
 		resp = u.Message(false, "failed")
 		resp["error"] = err
+	} else {
+		resp = data
 	}
 	u.Respond(w, resp)
 }

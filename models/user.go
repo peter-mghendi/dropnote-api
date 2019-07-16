@@ -2,6 +2,7 @@ package models
 
 import (
 	u "dropnote-backend/utils"
+	"errors"
 	"os"
 	"strings"
 
@@ -28,38 +29,37 @@ type User struct {
 }
 
 // Validate checks incoming user details
-func (user *User) Validate(db *gorm.DB) (map[string]interface{}, bool) {
+func (user *User) Validate(db *gorm.DB) error {
 	if !strings.Contains(user.Mail, "@") {
-		return u.Message(false, "Email address is required"), false
+		return errors.New("Email address is required")
 	}
 
 	if len(user.Pass) < 6 {
-		return u.Message(false, "Password is required"), false
+		return errors.New("Password is required")
 	}
 
 	temp := &User{}
 	err := db.Where(User{Mail: user.Mail}).First(temp).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return u.Message(false, "Connection error. Please retry"), false
+		return errors.New("Connection error. Please retry")
 	}
 	if temp.Mail != "" {
-		return u.Message(false, "Email address already in use by another user."), false
+		return errors.New("Email address already in use by another user")
 	}
 
-	return u.Message(false, "Requirement passed"), true
+	return nil
 }
 
 // Create adds the referenced user to the database
-func (user *User) Create(db *gorm.DB) map[string]interface{} {
-	if resp, ok := user.Validate(db); !ok {
-		return resp
+func (user *User) Create(db *gorm.DB) (map[string]interface{}, error) {
+	if err := user.Validate(db); err != nil {
+		return nil, err
 	}
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Pass), bcrypt.DefaultCost)
 	user.Pass = string(hashedPassword)
-
 	if db.Create(&user).Error != nil {
-		return u.Message(false, "Failed to create user, connection error.")
+		return nil, errors.New("Failed to create user, connection error")
 	}
 
 	token := &Token{UserID: user.ID}
@@ -69,24 +69,24 @@ func (user *User) Create(db *gorm.DB) map[string]interface{} {
 	user.Pass = ""
 
 	resp := u.Message(true, "User has been created")
-	resp["user"] = user
-	return resp
+	resp["data"] = user
+	return resp, nil
 }
 
 // Login authorizes a user and assigns JWT token
-func Login(db *gorm.DB, mail, pass string) map[string]interface{} {
+func Login(db *gorm.DB, mail, pass string) (map[string]interface{}, error) {
 	user := &User{}
 	err := db.Where(User{Mail: mail}).First(user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return u.Message(false, "Email address not found")
+			return nil, errors.New("Email address not found")
 		}
-		return u.Message(false, "Connection error. Please retry")
+		return nil, errors.New("Connection error. Please retry")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Pass), []byte(pass))
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return u.Message(false, "Invalid login credentials. Please try again")
+		return nil, errors.New("Invalid login credentials. Please try again")
 	}
 	user.Pass = ""
 
@@ -96,8 +96,8 @@ func Login(db *gorm.DB, mail, pass string) map[string]interface{} {
 	user.Auth = authString
 
 	resp := u.Message(true, "Logged In")
-	resp["user"] = user
-	return resp
+	resp["data"] = user
+	return resp, nil
 }
 
 // GetUser fetches the user from db
@@ -123,14 +123,19 @@ func GetUserByMail(db *gorm.DB, mail string) (user *User) {
 }
 
 // UpdateUser updates a user in the db
-func UpdateUser(db *gorm.DB, user *User) (err error) {
-	err = db.Model(&user).Updates(User{Name: user.Name, Mail: user.Mail}).Error
-	return
+func UpdateUser(db *gorm.DB, user *User) (map[string]interface{}, error) {
+	if err := db.Model(&user).Updates(User{Name: user.Name, Mail: user.Mail}).Error; err != nil {
+		return nil, err
+	}
+
+	resp := u.Message(true, "success")
+	resp["data"] = user
+	return resp, nil
 }
 
 // UpdatePassword hashes and updates provided password
 func UpdatePassword(db *gorm.DB, user *User) (err error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Pass), 10)
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Pass), bcrypt.DefaultCost)
 	if err != nil {
 		return
 	}

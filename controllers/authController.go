@@ -16,7 +16,12 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := user.Create(App.DB)
+	resp := make(map[string]interface{})
+	if data, err := user.Create(App.DB); err != nil {
+		resp = u.Message(false, err.Error())
+	} else {
+		resp = data
+	}
 	u.Respond(w, resp)
 }
 
@@ -29,6 +34,11 @@ func AuthUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := models.Login(App.DB, user.Mail, user.Pass)
+	resp := make(map[string]interface{})
+	if data, err := models.Login(App.DB, user.Mail, user.Pass); err != nil {
+		resp = u.Message(false, err.Error())
+	} else {
+		resp = data
+	}
 	u.Respond(w, resp)
 }

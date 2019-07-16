@@ -37,7 +37,7 @@ func (note *Note) Create(db *gorm.DB) map[string]interface{} {
 	}
 	db.Create(note)
 	resp := u.Message(true, "success")
-	resp["note"] = note
+	resp["data"] = note
 	return resp
 }
 
@@ -74,16 +74,17 @@ func GetNotesFor(db *gorm.DB, user uuid.UUID) (notes []*Note) {
 }
 
 // UpdateNote updates a note created by a specific user
-func UpdateNote(db *gorm.DB, note *Note) error {
+func UpdateNote(db *gorm.DB, note *Note) (map[string]interface{}, error) {
 	if err := db.Save(note).Error; err != nil {
-		return errors.New(err.Error())
+		return nil, errors.New(err.Error())
 	}
-	return nil
+	resp := u.Message(true, "success")
+	resp["data"] = note
+	return resp, nil
 }
 
 // DeleteNote deletes a note created by a specific user
 func DeleteNote(db *gorm.DB, note *Note) error {
-	// count := db.Where(&Note{Base: Base{ID: note}, Creator: user}).Delete(&Note{}).RowsAffected
 	count := db.Delete(note).RowsAffected
 	if count == 0 {
 		return errors.New("No rows matching criteria")
