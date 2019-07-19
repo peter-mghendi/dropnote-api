@@ -104,7 +104,7 @@ func DoReset(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// HACK Save struct and redirect
-		id, _ := uuid.NewV4()
+		id := uuid.NewV4()
 		data := dataset{Status: title, Message: message}
 		sets[id] = data
 		uri := fmt.Sprintf("/api/forms/result/%s", id.String())

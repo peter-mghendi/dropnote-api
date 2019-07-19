@@ -75,10 +75,7 @@ func (c *Code) perform(db *gorm.DB, body io.ReadCloser) error {
 
 // New returns a pointer to a new Code variable
 func New(db *gorm.DB, action int, userID uuid.UUID) (uuid.UUID, error) {
-	ticket, err := uuid.NewV4()
-	if err != nil {
-		return uuid.Nil, err
-	}
+	ticket := uuid.NewV4()
 	expiry := time.Now().Add(time.Hour * 24)
 	code := &Code{ticket, userID, expiry, action}
 	db.Create(code)
