@@ -53,6 +53,13 @@ func (a *App) initRoutes() {
 	a.Router.HandleFunc(deleteUserNote, controllers.DeleteUserNote).Methods(delete)
 	a.Router.HandleFunc(generateCode, controllers.GenerateCode).Methods(post)
 	a.Router.HandleFunc(executeCode, controllers.ExecuteCode).Methods(post)
+
+	a.Router.HandleFunc("/api/forms/user/{user}/reset/{code}", controllers.DoReset).Methods(get, post)
+	a.Router.HandleFunc("/api/forms/result/{data}", controllers.ShowResult).Methods(get)
+
+	assetDirectory := http.Dir("./assets/")
+	assetHandler := http.StripPrefix("/assets/", http.FileServer(assetDirectory))
+	a.Router.PathPrefix("/assets/").Handler(assetHandler).Methods("GET")
 }
 
 func (a *App) initVars() {

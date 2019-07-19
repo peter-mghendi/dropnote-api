@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/l3njo/dropnote-backend/models"
 	u "github.com/l3njo/dropnote-backend/utils"
-	"net/http"
 
 	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
@@ -45,7 +47,8 @@ func ExecuteCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = models.Execute(App.DB, r.Body, code, user); err != nil {
-		u.Respond(w, u.Message(false, err.Error()))
+		log.Println(err.Error())
+		u.Respond(w, u.Message(false, "There was an error in your request"))
 		return
 	}
 
