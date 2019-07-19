@@ -2,14 +2,14 @@ package controllers
 
 import (
 	"bytes"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	rand "github.com/l3njo/play/misc"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -18,12 +18,45 @@ type content struct {
 }
 
 type dataset struct {
-	Status, Message, Error string
+	Status, Message string
+}
+
+type response struct {
+	Message string `json:"message"`
+	Status  bool   `json:"status"`
+}
+
+func (thingOne dataset) equals(thingTwo dataset) bool {
+	return thingOne.Status == thingTwo.Status && thingOne.Message == thingTwo.Message
 }
 
 // HACK for testing only
 var sets = make(map[uuid.UUID]dataset)
 
+func getResponse(password string, user, code uuid.UUID) (response, error) {
+	reply := response{}
+	requestBody, err := json.Marshal(map[string]string{
+		"password": password,
+	})
+	if err != nil {
+		return response{}, err
+	}
+
+	uri := fmt.Sprintf("http://localhost:8000/api/user/%s/action/%s", user.String(), code.String())
+	resp, err := http.Post(uri, "application/json", bytes.NewBuffer(requestBody))
+	if err != nil {
+		return response{}, err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &reply)
+	if err != nil {
+		return response{}, err
+	}
+	return reply, nil
+}
+
+// DoReset recieves, validates and processes reset request
 func DoReset(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	user := uuid.FromStringOrNil(params["user"])
@@ -34,7 +67,6 @@ func DoReset(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, uri, http.StatusFound)
 		return
 	}
-	// TODO additional validation, check if user and code exist?
 
 	fmt.Println("method", r.Method)
 
@@ -49,21 +81,26 @@ func DoReset(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// TODO Update password, get error if any
 		r.ParseForm()
-		fmt.Println(r.Form["password"])
-		title := "Success"
-		ok, str, err := genRandomStatus()
-		if !ok {
-			title = "Failed"
+		title, message := "Success", "Password reset successfully"
+
+		if len(r.Form["password"]) != 1 {
+			log.Println("Invalid input")
+		}
+		pass := r.Form["password"][0]
+
+		resp, err := getResponse(pass, user, code)
+		fmt.Println(resp)
+		if err != nil {
+			log.Println(err)
+		}
+		if !resp.Status {
+			title, message = "Failed", "Something went wrong"
 		}
 
 		// HACK Save struct
 		id, _ := uuid.NewV4()
-		message := dataset{
-			Status:  title,
-			Message: str,
-			Error:   err.Error(),
-		}
-		sets[id] = message
+		data := dataset{Status: title, Message: message}
+		sets[id] = data
 
 		// HACK Redirect
 		uri := fmt.Sprintf("/api/forms/result/%s", id.String())
@@ -71,6 +108,7 @@ func DoReset(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ShowResult shows results of processing
 func ShowResult(w http.ResponseWriter, r *http.Request) {
 	// HACK Get Struct
 	params := mux.Vars(r)
@@ -80,7 +118,6 @@ func ShowResult(w http.ResponseWriter, r *http.Request) {
 		message = dataset{
 			Status:  "Error",
 			Message: "You are not allowed to access this page",
-			Error:   "",
 		}
 	} else {
 		delete(sets, id)
@@ -96,26 +133,4 @@ func ShowResult(w http.ResponseWriter, r *http.Request) {
 	}
 	t, _ = template.ParseFiles("templates/base.html.tmpl")
 	t.Execute(w, data)
-}
-
-func (thingOne dataset) equals(thingTwo dataset) bool {
-	return thingOne.Status == thingTwo.Status && thingOne.Message == thingTwo.Message && thingOne.Error == thingTwo.Error
-}
-
-func genRandomStatus() (status bool, str string, err error) {
-	status = rand.Bool()
-	str = "Password reset successfully"
-	if !status {
-		str = "Something went wrong"
-	}
-	err = errors.New(getRandStr(status))
-	return
-}
-
-func getRandStr(ok bool) string {
-	failed := []string{"Something went wrong", "Something happened", "All your base are belong to us"}
-	if ok {
-		return ""
-	}
-	return failed[rand.IntInRange(0, len(failed))]
 }
