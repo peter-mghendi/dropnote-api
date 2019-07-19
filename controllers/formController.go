@@ -30,8 +30,15 @@ func (thingOne dataset) equals(thingTwo dataset) bool {
 	return thingOne.Status == thingTwo.Status && thingOne.Message == thingTwo.Message
 }
 
-// HACK for testing only
+// HACK transfer dataset between endpoints
 var sets = make(map[uuid.UUID]dataset)
+
+func init() {
+	sets[uuid.Nil] = dataset{
+		Status:  "Error",
+		Message: "You are not allowed to access this page",
+	}
+}
 
 func getResponse(password string, user, code uuid.UUID) (response, error) {
 	reply := response{}
@@ -79,7 +86,6 @@ func DoReset(w http.ResponseWriter, r *http.Request) {
 		t, _ := template.ParseFiles("templates/base.html.tmpl")
 		t.Execute(w, data)
 	} else {
-		// TODO Update password, get error if any
 		r.ParseForm()
 		title, message := "Success", "Password reset successfully"
 
@@ -97,12 +103,10 @@ func DoReset(w http.ResponseWriter, r *http.Request) {
 			title, message = "Failed", "Something went wrong"
 		}
 
-		// HACK Save struct
+		// HACK Save struct and redirect
 		id, _ := uuid.NewV4()
 		data := dataset{Status: title, Message: message}
 		sets[id] = data
-
-		// HACK Redirect
 		uri := fmt.Sprintf("/api/forms/result/%s", id.String())
 		http.Redirect(w, r, uri, http.StatusFound)
 	}
@@ -110,16 +114,10 @@ func DoReset(w http.ResponseWriter, r *http.Request) {
 
 // ShowResult shows results of processing
 func ShowResult(w http.ResponseWriter, r *http.Request) {
-	// HACK Get Struct
 	params := mux.Vars(r)
-	id, _ := uuid.FromString(params["data"])
+	id := uuid.FromStringOrNil(params["data"])
 	message := sets[id]
-	if message.equals(dataset{}) {
-		message = dataset{
-			Status:  "Error",
-			Message: "You are not allowed to access this page",
-		}
-	} else {
+	if id != uuid.Nil {
 		delete(sets, id)
 	}
 
