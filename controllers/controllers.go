@@ -28,6 +28,6 @@ func init() {
 
 func emailTokenToUser(user, code uuid.UUID) bool {
 	// TODO
-	fmt.Printf("http://localhost:8000/api/forms/user/%s/reset/%s\n", user.String(), code.String())
+	fmt.Printf("https://dropnote-api.herokuapp.com/api/forms/user/%s/reset/%s\n", user.String(), code.String())
 	return true
 }

@@ -30,7 +30,7 @@ func (a *App) initDB(u URI) {
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", u.Host, u.User, u.Name, u.Pass)
 	a.DB, err = gorm.Open(u.Type, dbURI)
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(err)
 	}
 
 	a.DB.Debug().AutoMigrate(&models.User{}, &models.Note{}, &models.Code{})
@@ -75,6 +75,6 @@ func (a *App) Init(u URI) {
 
 // Run serves the API on a specified port
 func (a *App) Run() {
-	fmt.Printf("Serving on localhost:%v\n", a.Port)
+	fmt.Printf("Serving on:%v\n", a.Port)
 	log.Fatal(http.ListenAndServe(":"+a.Port, a.Router))
 }

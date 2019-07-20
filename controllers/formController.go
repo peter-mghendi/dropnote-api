@@ -49,7 +49,7 @@ func getResponse(password string, user, code uuid.UUID) (response, error) {
 		return response{}, err
 	}
 
-	uri := fmt.Sprintf("http://localhost:8000/api/user/%s/action/%s", user.String(), code.String())
+	uri := fmt.Sprintf("https://dropnote-api.herokuapp.com/api/user/%s/action/%s", user.String(), code.String())
 	resp, err := http.Post(uri, "application/json", bytes.NewBuffer(requestBody))
 	if err != nil {
 		return response{}, err

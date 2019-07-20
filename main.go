@@ -18,7 +18,7 @@ var uri a.URI
 func init() {
 	e := godotenv.Load()
 	if e != nil {
-		fmt.Print(e)
+		fmt.Println(e)
 	}
 
 	uri = a.URI{}
