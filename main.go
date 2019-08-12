@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
-	a "github.com/l3njo/dropnote-backend/app"
+	a "github.com/l3njo/dropnote-api/app"
+	c "github.com/l3njo/dropnote-api/controllers"
 
 	"github.com/joho/godotenv"
 
@@ -17,22 +17,16 @@ var uri a.URI
 
 func init() {
 	e := godotenv.Load()
-	if e != nil {
-		fmt.Println(e)
+	c.Handle(e)
+	uri = a.URI{
+		Host: os.Getenv("db_host"),
+		User: os.Getenv("db_user"),
+		Name: os.Getenv("db_name"),
+		Pass: os.Getenv("db_pass"),
 	}
-
-	uri = a.URI{}
-	uri.Host = os.Getenv("db_host")
-	uri.User = os.Getenv("db_user")
-	uri.Name = os.Getenv("db_name")
-	uri.Pass = os.Getenv("db_pass")
-	uri.Type = os.Getenv("db_type")
 
 	app = a.App{}
 	app.Port = os.Getenv("PORT")
-	if app.Port == "" {
-		app.Port = "8000"
-	}
 }
 
 func main() {

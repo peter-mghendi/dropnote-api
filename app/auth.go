@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/l3njo/dropnote-backend/controllers"
-	"github.com/l3njo/dropnote-backend/models"
-	u "github.com/l3njo/dropnote-backend/utils"
+	"github.com/l3njo/dropnote-api/controllers"
+	"github.com/l3njo/dropnote-api/models"
+	u "github.com/l3njo/dropnote-api/utils"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	uuid "github.com/satori/go.uuid"
@@ -42,7 +42,7 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 			}
 
 			// codeController
-			if strings.Contains(requestPath, "/action/") || strings.Contains(requestPath, "/assets/") || strings.Contains(requestPath, "/forms/") {
+			if strings.Contains(requestPath, "/actions/") || strings.Contains(requestPath, "/assets/") || strings.Contains(requestPath, "/forms/") {
 				next.ServeHTTP(w, r)
 				return
 			}

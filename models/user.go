@@ -1,7 +1,7 @@
 package models
 
 import (
-	u "github.com/l3njo/dropnote-backend/utils"
+	u "github.com/l3njo/dropnote-api/utils"
 	"errors"
 	"os"
 	"strings"

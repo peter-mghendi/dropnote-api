@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/l3njo/dropnote-backend/models"
-	u "github.com/l3njo/dropnote-backend/utils"
+	"github.com/l3njo/dropnote-api/models"
+	u "github.com/l3njo/dropnote-api/utils"
 	"encoding/json"
 	"net/http"
 

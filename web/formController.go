@@ -1,4 +1,4 @@
-package controllers
+package web
 
 import (
 	"bytes"
@@ -12,6 +12,8 @@ import (
 	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
 )
+
+const api = "https://dropnote-api.herokuapp.com/api/"
 
 type content struct {
 	Content template.HTML
@@ -49,7 +51,7 @@ func getResponse(password string, user, code uuid.UUID) (response, error) {
 		return response{}, err
 	}
 
-	uri := fmt.Sprintf("https://dropnote-api.herokuapp.com/api/user/%s/action/%s", user.String(), code.String())
+	uri := fmt.Sprintf("%suser/%s/action/%s", api, user.String(), code.String())
 	resp, err := http.Post(uri, "application/json", bytes.NewBuffer(requestBody))
 	if err != nil {
 		return response{}, err
@@ -75,8 +77,6 @@ func DoReset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("method", r.Method)
-
 	if r.Method == "GET" {
 		bytes, _ := ioutil.ReadFile("templates/auth.html.tmpl")
 		body := template.HTML(bytes)
@@ -85,31 +85,29 @@ func DoReset(w http.ResponseWriter, r *http.Request) {
 		}
 		t, _ := template.ParseFiles("templates/base.html.tmpl")
 		t.Execute(w, data)
-	} else {
-		r.ParseForm()
-		title, message := "Success", "Password reset successfully"
-
-		if len(r.Form["password"]) != 1 {
-			log.Println("Invalid input")
-		}
-		pass := r.Form["password"][0]
-
-		resp, err := getResponse(pass, user, code)
-		fmt.Println(resp)
-		if err != nil {
-			log.Println(err)
-		}
-		if !resp.Status {
-			title, message = "Failed", "Something went wrong"
-		}
-
-		// HACK Save struct and redirect
-		id := uuid.NewV4()
-		data := dataset{Status: title, Message: message}
-		sets[id] = data
-		uri := fmt.Sprintf("/api/forms/result/%s", id.String())
-		http.Redirect(w, r, uri, http.StatusFound)
+		return
 	}
+	r.ParseForm()
+	title, message := "Success", "Password reset successfully"
+
+	if len(r.Form["password"]) != 1 {
+		log.Println("Invalid input")
+		return
+	}
+	pass := r.Form["password"][0]
+
+	resp, err := getResponse(pass, user, code)
+	handle(err)
+	if !resp.Status {
+		title, message = "Failed", "Something went wrong"
+	}
+
+	// HACK Save struct and redirect
+	id := uuid.NewV4()
+	data := dataset{Status: title, Message: message}
+	sets[id] = data
+	uri := fmt.Sprintf("/api/forms/result/%s", id.String())
+	http.Redirect(w, r, uri, http.StatusFound)
 }
 
 // ShowResult shows results of processing
@@ -131,4 +129,10 @@ func ShowResult(w http.ResponseWriter, r *http.Request) {
 	}
 	t, _ = template.ParseFiles("templates/base.html.tmpl")
 	t.Execute(w, data)
+}
+
+func handle(e error) {
+	if e != nil {
+		log.Println(e)
+	}
 }

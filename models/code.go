@@ -73,8 +73,8 @@ func (c *Code) perform(db *gorm.DB, body io.ReadCloser) error {
 	return nil
 }
 
-// New returns a pointer to a new Code variable
-func New(db *gorm.DB, action int, userID uuid.UUID) (uuid.UUID, error) {
+// NewCode returns a pointer to a new Code variable
+func NewCode(db *gorm.DB, action int, userID uuid.UUID) (uuid.UUID, error) {
 	ticket := uuid.NewV4()
 	expiry := time.Now().Add(time.Hour * 24)
 	code := &Code{ticket, userID, expiry, action}

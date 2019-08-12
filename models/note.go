@@ -1,9 +1,10 @@
 package models
 
 import (
-	u "github.com/l3njo/dropnote-backend/utils"
 	"errors"
-	"fmt"
+	"log"
+
+	u "github.com/l3njo/dropnote-api/utils"
 
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
@@ -44,7 +45,7 @@ func (note *Note) Create(db *gorm.DB) map[string]interface{} {
 // GetNote returns a single note, if present, that matches provided criteria
 func GetNote(db *gorm.DB, id uuid.UUID) (note *Note) {
 	note = &Note{}
-	err := db.Where(&Note{Base: Base{ID: id}}).First(note).Error
+	err := db.Where(&Note{Base: Base{ID: id}, Visible: true}).First(note).Error
 	if err != nil {
 		return nil
 	}
@@ -56,7 +57,7 @@ func GetNotes(db *gorm.DB) (notes []*Note) {
 	notes = make([]*Note, 0)
 	err := db.Find(&notes).Error
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil
 	}
 	return
@@ -67,7 +68,7 @@ func GetNotesFor(db *gorm.DB, user uuid.UUID) (notes []*Note) {
 	notes = make([]*Note, 0)
 	err := db.Where(&Note{Creator: user}).Find(&notes).Error
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return nil
 	}
 	return

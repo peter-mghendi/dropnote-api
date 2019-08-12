@@ -1,1 +1,1 @@
-web: ./bin/dropnote-backend
+web: ./bin/dropnote-api
