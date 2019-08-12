@@ -38,7 +38,6 @@ var (
 func init() {
 	App = &Application{}
 	h = hermes.Hermes{
-		Theme: new(hermes.Flat),
 		Product: hermes.Product{
 			Name:        "DropNote",
 			Link:        "https://drop-note.herokuapp.com/",
