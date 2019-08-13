@@ -50,6 +50,7 @@ func (a *App) initRoutes() {
 	a.Router.HandleFunc(deleteUser, controllers.DeleteUser).Methods(delete)
 	a.Router.HandleFunc(getUserNotes, controllers.GetUserNotes).Methods(get)
 	a.Router.HandleFunc(updateUserNote, controllers.UpdateUserNote).Methods(put)
+	a.Router.HandleFunc(toggleUserNote, controllers.ToggleUserNote).Methods(put)
 	a.Router.HandleFunc(deleteUserNote, controllers.DeleteUserNote).Methods(delete)
 	a.Router.HandleFunc(generateCode, controllers.GenerateCode).Methods(post)
 	a.Router.HandleFunc(executeCode, controllers.ExecuteCode).Methods(post)

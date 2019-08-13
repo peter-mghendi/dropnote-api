@@ -43,9 +43,20 @@ func (note *Note) Create(db *gorm.DB) map[string]interface{} {
 }
 
 // GetNote returns a single note, if present, that matches provided criteria
+// and has visible == true
 func GetNote(db *gorm.DB, id uuid.UUID) (note *Note) {
 	note = &Note{}
 	err := db.Where(&Note{Base: Base{ID: id}, Visible: true}).First(note).Error
+	if err != nil {
+		return nil
+	}
+	return
+}
+
+// GetNoteUnscoped returns a single note, if present, that matches provided criteria
+func GetNoteUnscoped(db *gorm.DB, id uuid.UUID) (note *Note) {
+	note = &Note{}
+	err := db.Where(&Note{Base: Base{ID: id}}).First(note).Error
 	if err != nil {
 		return nil
 	}
@@ -74,17 +85,27 @@ func GetNotesFor(db *gorm.DB, user uuid.UUID) (notes []*Note) {
 	return
 }
 
-// UpdateNote updates a note created by a specific user
+// UpdateNote updates a note
 func UpdateNote(db *gorm.DB, note *Note) (map[string]interface{}, error) {
-	if err := db.Save(note).Error; err != nil {
-		return nil, errors.New(err.Error())
+	if err := db.Model(&note).Updates(Note{Subject: note.Subject, Content: note.Content}).Error; err != nil {
+		return nil, err
 	}
 	resp := u.Message(true, "success")
 	resp["data"] = note
 	return resp, nil
 }
 
-// DeleteNote deletes a note created by a specific user
+// ToggleNote updates a note
+func ToggleNote(db *gorm.DB, note *Note) (map[string]interface{}, error) {
+	if err := db.Save(note).Error; err != nil {
+		return nil, err
+	}
+	resp := u.Message(true, "success")
+	resp["data"] = note
+	return resp, nil
+}
+
+// DeleteNote deletes a note
 func DeleteNote(db *gorm.DB, note *Note) error {
 	count := db.Delete(note).RowsAffected
 	if count == 0 {

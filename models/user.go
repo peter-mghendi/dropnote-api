@@ -1,10 +1,11 @@
 package models
 
 import (
-	u "github.com/l3njo/dropnote-api/utils"
 	"errors"
 	"os"
 	"strings"
+
+	u "github.com/l3njo/dropnote-api/utils"
 
 	"golang.org/x/crypto/bcrypt"
 

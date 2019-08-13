@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"github.com/l3njo/dropnote-api/models"
-	u "github.com/l3njo/dropnote-api/utils"
 	"encoding/json"
 	"net/http"
+
+	"github.com/l3njo/dropnote-api/models"
+	u "github.com/l3njo/dropnote-api/utils"
 
 	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
@@ -130,6 +131,38 @@ func UpdateUserNote(w http.ResponseWriter, r *http.Request) {
 
 	resp := make(map[string]interface{})
 	if data, err := models.UpdateNote(App.DB, note); err != nil {
+		resp = u.Message(false, "failed")
+		resp["error"] = err
+	} else {
+		resp = data
+	}
+	u.Respond(w, resp)
+}
+
+// ToggleUserNote is the handler function for togglling visibility for a note created by current user in the database
+func ToggleUserNote(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	user := r.Context().Value(UserKey).(uuid.UUID)
+	id, err := uuid.FromString(params["id"])
+	if err != nil {
+		u.Respond(w, u.Message(false, "There was an error in your request"))
+		return
+	}
+
+	note := models.GetNoteUnscoped(App.DB, id)
+	if note == nil {
+		u.Respond(w, u.Message(false, "That note does not exist"))
+		return
+	}
+
+	if !uuid.Equal(note.Creator, user) {
+		u.Respond(w, u.Message(false, "You are not authorized to modify that record"))
+		return
+	}
+
+	note.Visible = !note.Visible
+	resp := make(map[string]interface{})
+	if data, err := models.ToggleNote(App.DB, note); err != nil {
 		resp = u.Message(false, "failed")
 		resp["error"] = err
 	} else {
