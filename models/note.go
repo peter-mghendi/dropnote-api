@@ -46,19 +46,9 @@ func (note *Note) Create(db *gorm.DB) map[string]interface{} {
 // and has visible == true
 func GetNote(db *gorm.DB, id uuid.UUID) (note *Note) {
 	note = &Note{}
-	err := db.Where(&Note{Base: Base{ID: id}, Visible: true}).First(note).Error
-	if err != nil {
-		return nil
-	}
-	return
-}
-
-// GetNoteUnscoped returns a single note, if present, that matches provided criteria
-func GetNoteUnscoped(db *gorm.DB, id uuid.UUID) (note *Note) {
-	note = &Note{}
 	err := db.Where(&Note{Base: Base{ID: id}}).First(note).Error
 	if err != nil {
-		return nil
+		return &Note{}
 	}
 	return
 }

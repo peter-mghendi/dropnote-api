@@ -149,7 +149,7 @@ func ToggleUserNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	note := models.GetNoteUnscoped(App.DB, id)
+	note := models.GetNote(App.DB, id)
 	if note == nil {
 		u.Respond(w, u.Message(false, "That note does not exist"))
 		return

@@ -17,26 +17,14 @@ import (
 // JwtAuthentication checks validity of the JWT
 var JwtAuthentication = func(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		notAuth := []string{createUser, authUser, getNote, getNotes}
-		mayAuth := []string{createNote}
+		notAuth := []string{createUser, authUser, getNotes}
+		mayAuth := []string{createNote, getNote}
 		requestPath := r.URL.Path
 
 		for _, value := range notAuth {
 			// TODO
 			// notAuth
 			if value == requestPath {
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			// getNote
-			prefix := strings.TrimSuffix(value, "{id}")
-			suffix := strings.TrimPrefix(requestPath, prefix)
-			isUUID := false
-			if _, err := uuid.FromString(suffix); err == nil {
-				isUUID = true
-			}
-			if strings.HasPrefix(requestPath, prefix) && isUUID {
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -53,6 +41,17 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 		if tokenHeader == "" {
 			for _, value := range mayAuth {
 				if value == requestPath {
+					next.ServeHTTP(w, r)
+				}
+
+				// getNote
+				prefix := strings.TrimSuffix(value, "{id}")
+				suffix := strings.TrimPrefix(requestPath, prefix)
+				isUUID := false
+				if _, err := uuid.FromString(suffix); err == nil {
+					isUUID = true
+				}
+				if strings.HasPrefix(requestPath, prefix) && isUUID {
 					next.ServeHTTP(w, r)
 					return
 				}
