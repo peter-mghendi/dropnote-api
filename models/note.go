@@ -77,7 +77,10 @@ func GetNotesFor(db *gorm.DB, user uuid.UUID) (notes []*Note) {
 
 // UpdateNote updates a note
 func UpdateNote(db *gorm.DB, note *Note) (map[string]interface{}, error) {
-	if err := db.Model(&note).Updates(Note{Subject: note.Subject, Content: note.Content, Creator: note.Creator}).Error; err != nil {
+	if err := db.Model(&note).Updates(Note{Subject: note.Subject, Content: note.Content}).Error; err != nil {
+		return nil, err
+	}
+	if err := db.Save(note).Error; err != nil {
 		return nil, err
 	}
 	resp := u.Message(true, "success")
